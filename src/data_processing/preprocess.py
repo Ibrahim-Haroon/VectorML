@@ -40,10 +40,17 @@ def get_padded_sequences_and_tokenizer() -> tf.Tensor and tf.keras.preprocessing
     return padded_sequences, tokenizer
 
 
-def main() -> None:
-    padded_sequences = get_padded_sequences_and_tokenizer()
+def save_padded_sequences(padded_sequences) -> None:
+    processed_data_path = path.join(path.dirname(path.realpath(__file__)), '../../data', 'processed.csv')
+    df_sequences = pd.DataFrame(padded_sequences)
+    df_sequences.to_csv(processed_data_path, index=False)
+    print(f"Data saved to {processed_data_path}")
 
+
+def main() -> None:
+    padded_sequences, _ = get_padded_sequences_and_tokenizer()
     print_padded_sequences(padded_sequences)
+    save_padded_sequences(padded_sequences)
 
 
 if __name__ == '__main__':
