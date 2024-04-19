@@ -45,7 +45,7 @@ def train_model(
 def main(
 
 ) -> None:
-    save_path = path.join(path.dirname(path.realpath(__file__)), "../", "other/ml_model.keras")
+    save_path = path.join(path.dirname(path.realpath(__file__)), "embedding_model.keras")
 
     padded_sequences, tokenizer = get_padded_sequences_and_tokenizer()
     vocab_size = len(tokenizer.word_index) + 1
