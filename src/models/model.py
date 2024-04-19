@@ -12,7 +12,7 @@ def build_model(
     model = Sequential([
         Embedding(input_dim=vocab_size, output_dim=output_dim),
         Flatten(),
-        Dense(vocab_size, activation='softmax')
+        Dense(1, activation='sigmoid')
     ])
 
     model.compile(optimizer='adam', loss='binary_crossentropy')
@@ -49,10 +49,10 @@ def main(
 
     padded_sequences, tokenizer = get_padded_sequences_and_tokenizer()
     vocab_size = len(tokenizer.word_index) + 1
-    input_sequences = np.array(padded_sequences)
-    target_sequences = np.zeros((input_sequences.shape[0], 1))
+    input_sequences = np.array(padded_sequences, dtype='float32')
+    target_sequences = np.zeros((input_sequences.shape[0], 1), dtype='float32')
 
-    model = build_model(vocab_size, padded_sequences)
+    model = build_model(vocab_size)
     train_model(model, input_sequences, target_sequences, save_path)
 
 
