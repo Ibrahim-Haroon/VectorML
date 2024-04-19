@@ -8,7 +8,7 @@ from os import path
 
 def get_embedding(
         string: str,
-        save_path: str = path.join(path.dirname(path.realpath(__file__)), "../", "other/ml_model.keras")
+        save_path: str = path.join(path.dirname(path.realpath(__file__)), "embedding_model.keras")
 ) -> np.ndarray:
     model = tf.keras.models.load_model(save_path)
 
