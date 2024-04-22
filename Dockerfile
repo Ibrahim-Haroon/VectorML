@@ -2,6 +2,7 @@ FROM python:3.11
 
 ENV PYTHONUNBUFFERED 1
 ENV TZ=America/New_York
+ENV PYTHONPATH="/VectorML/src:$PYTHONPATH"
 
 WORKDIR /VectorML
 
