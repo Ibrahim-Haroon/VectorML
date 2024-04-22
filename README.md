@@ -19,11 +19,6 @@ docker-compose up --build
 docker exec -it vector-ml-server bash
 ```
 
-### Setup Python Path
-```
-export PYTHONPATH="/VectorML/src:$PYTHONPATH"
-```
-
 ### Training the Model
 ```
 python src/models/model.py
