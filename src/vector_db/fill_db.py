@@ -1,3 +1,6 @@
+"""
+This module is responsible for filling the database with the clothing articles and creating the search index
+"""
 from os import path
 import pandas as pd
 from tqdm import tqdm
@@ -10,6 +13,11 @@ from redis.commands.search.indexDefinition import IndexDefinition, IndexType
 def parse_clothing_articles_csv(
 
 ) -> list[dict]:
+    """
+    @purpose: This function is responsible for parsing the clothing articles csv file
+    :rtype: list[dict]
+    :return: list of clothing articles
+    """
     clothing_collection = []
     csv_file_path = path.join(path.dirname(path.realpath(__file__)), "../../data", "clothing_articles.csv")
 
@@ -34,6 +42,13 @@ def parse_clothing_articles_csv(
 def fill_db(
         conn: Redis, clothing_collection: list[dict]
 ) -> None:
+    """
+    @purpose: This function is responsible for filling the database with the clothing articles
+    :param conn: db connection
+    :param clothing_collection: list of clothing articles
+    :rtype: None
+    :return: None
+    """
     vector_field_name = "weather_vector"
     clothing_field_name = "clothing_articles"
 
@@ -61,6 +76,11 @@ def fill_db(
 def create_search_index(
         conn: Redis
 ) -> None:
+    """
+    @purpose: This function is responsible for creating the search index
+    :param conn: db connection
+    :return: None
+    """
     IDX_NAME = 'clothing_idx'
     schema = (
         VectorField('$.weather_vector', 'FLAT', {

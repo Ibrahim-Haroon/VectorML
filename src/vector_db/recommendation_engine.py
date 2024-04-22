@@ -1,3 +1,6 @@
+"""
+This module contains the recommendation engine for generating clothing suggestions based on the current weather.
+"""
 from pprint import pprint
 import numpy as np
 from redis import Redis
@@ -8,6 +11,13 @@ from src.models.predict import get_embedding
 def similarity_search(
         redis_conn: Redis, query_vector: np.ndarray
 ) -> str:
+    """
+    @purpose: This function is responsible for finding the closest vector to the query_vector
+    :param redis_conn: db connection
+    :param query_vector: vector to search against
+    :rtype: str
+    :return: clothing suggestion
+    """
     IDX_NAME = 'clothing_idx'
     query_vector = query_vector.tobytes()
 
@@ -26,6 +36,13 @@ def similarity_search(
 def get_clothing_suggestion(
         weather: str, conn: Redis
 ) -> str:
+    """
+    @purpose: This API is responsible for generating a clothing suggestion based on the current weather
+    :param weather: current weather
+    :param conn: db connection
+    :rtype: str
+    :return: clothing suggestion
+    """
     weather_embedding = get_embedding(weather)
 
     return similarity_search(conn, weather_embedding)
