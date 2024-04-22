@@ -6,11 +6,11 @@ services:
     container_name: vector-ml-server
     build: .
     depends_on:
-      - redis_search
+      - redis
     stdin_open: true
     tty: true
     command: [ "/bin/bash" ]
-  redis_search:
+  redis:
     image: redis/redis-stack-server:latest
     container_name: redis-stack-server
     ports:
