@@ -32,5 +32,5 @@ def main(
 
 
 if __name__ == "__main__":
-    vectorDB_conn = Redis(host='localhost', port=6379)
+    vectorDB_conn = Redis(host='redis', port=6379)
     main(vectorDB_conn)

@@ -95,7 +95,7 @@ def create_search_index(
 
 
 if __name__ == "__main__":
-    redis_conn = Redis(host="localhost", port=6379)
+    redis_conn = Redis(host="redis", port=6379)
     redis_conn.flushall()
     collection = parse_clothing_articles_csv()
     fill_db(redis_conn, collection)

@@ -49,7 +49,7 @@ def get_clothing_suggestion(
 
 
 if __name__ == "__main__":
-    vectorDB_conn = Redis(host='localhost', port=6379)
+    vectorDB_conn = Redis(host='redis', port=6379)
     curr_weather = "sunny"
     suggestion = get_clothing_suggestion(curr_weather, vectorDB_conn)
     pprint(suggestion)
