@@ -7,7 +7,9 @@ from src.models.predict import get_embedding
 from redis.commands.search.field import VectorField, TextField
 
 
-def parse_clothing_articles_csv() -> list[dict]:
+def parse_clothing_articles_csv(
+
+) -> list[dict]:
     clothing_collection = []
     csv_file_path = path.join(path.dirname(path.realpath(__file__)), "../../data", "clothing_articles.csv")
 
@@ -29,7 +31,9 @@ def parse_clothing_articles_csv() -> list[dict]:
     return clothing_collection
 
 
-def fill_db(conn, clothing_collection):
+def fill_db(
+        conn: Redis, clothing_collection: list[dict]
+):
     vector_field_name = "weather_vector"
     clothing_field_name = "clothing_articles"
 
