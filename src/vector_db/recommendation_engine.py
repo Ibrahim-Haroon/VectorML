@@ -6,24 +6,26 @@ from src.models.predict import get_embedding
 
 
 def similarity_search(
-        conn: Redis, query_vector: np.ndarray
-) -> []:
+        redis_conn: Redis, query_vector: np.ndarray
+) -> str:
+    IDX_NAME = 'clothing_idx'
+    query_vector = query_vector.tobytes()
+
     query = (
-        Query(f"(@weather_vector:{{ $vec }})=>[KNN 1 @weather_vector $vec as score]")
-        .sort_by("score")
-        .return_fields("clothing_articles", "weather_vector", "score")
-        .paging(0, 1)
+        Query('(*)=>[KNN 1 @vector $vec AS vector_score]')
+        .sort_by('vector_score')
+        .return_fields('vector_score', '$.clothing_articles')
         .dialect(2)
     )
 
-    query_params = {"vec": query_vector.tobytes()}
+    results = redis_conn.ft(IDX_NAME).search(query, query_params={'vec': query_vector})
 
-    return conn.ft("idx").search(query, query_params).docs
+    return ([doc['$.clothing_articles'] for doc in results.docs])[0]
 
 
 def get_clothing_suggestion(
         weather: str, conn: Redis
-) -> []:
+) -> str:
     weather_embedding = get_embedding(weather)
 
     return similarity_search(conn, weather_embedding)
@@ -31,6 +33,6 @@ def get_clothing_suggestion(
 
 if __name__ == "__main__":
     vectorDB_conn = Redis(host='localhost', port=6379)
-    curr_weather = "rainy"
+    curr_weather = "sunny"
     suggestion = get_clothing_suggestion(curr_weather, vectorDB_conn)
     pprint(suggestion)
