@@ -1,17 +1,6 @@
 import re
-from pprint import pprint
-from src.models.predict import get_embedding
-
-
-'''
-Setup:
-- Redis
-
-Steps:
-1. Ask user for input regarding today's weather. Ex "Today is raining outside, what should I where?"
-2. Extract the weather (using regex)
-3. Preform a similarity search with the weather and arbitrary clothing fit from DB
-'''
+from redis import Redis
+from src.vector_db.recommendation_engine import get_clothing_suggestion
 
 
 def extract_weather(user_input: str) -> str:
@@ -22,18 +11,20 @@ def extract_weather(user_input: str) -> str:
     return matches[0]
 
 
-
 def get_user_input() -> str:
     return input("Enter a question regarding clothing: ")
 
 
-def main() -> None:
+def main(db_conn: Redis) -> None:
     user_input = get_user_input()
 
     weather = extract_weather(user_input)
 
-    pprint(weather)
+    suggestion = get_clothing_suggestion(weather, db_conn)
+
+    print(f"It is recommended to wear the following clothing: {suggestion}")
 
 
 if __name__ == "__main__":
-    main()
+    vectorDB_conn = Redis(host='localhost', port=6379)
+    main(vectorDB_conn)
