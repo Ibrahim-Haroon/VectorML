@@ -1,5 +1,5 @@
-other/
 myenv/
 .idea/
 *__pycache__*
 *.DS_Store
+src/models/embedding_model.keras
