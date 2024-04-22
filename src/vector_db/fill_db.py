@@ -1,3 +1,6 @@
+"""
+This module is responsible for filling the database with the clothing articles and creating the search index
+"""
 from os import path
 import pandas as pd
 from tqdm import tqdm
