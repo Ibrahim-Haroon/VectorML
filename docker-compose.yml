@@ -1,0 +1,24 @@
+version: '3.9'
+
+services:
+  vectorML:
+    image: vector-ml:latest
+    container_name: vector-ml-server
+    build: .
+    depends_on:
+      - redis_search
+    stdin_open: true
+    tty: true
+    command: [ "/bin/bash" ]
+  redis_search:
+    image: redis/redis-stack-server:latest
+    container_name: redis-stack-server
+    ports:
+      - "6379:6379"
+    stdin_open: true
+    tty: true
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
