@@ -1,10 +1,10 @@
-import numpy as np
 from os import path
 import pandas as pd
 from tqdm import tqdm
 from redis import Redis
 from src.models.predict import get_embedding
-from redis.commands.search.field import VectorField, TextField
+from redis.commands.search.field import VectorField
+from redis.commands.search.indexDefinition import IndexDefinition, IndexType
 
 
 def parse_clothing_articles_csv(
@@ -33,36 +33,50 @@ def parse_clothing_articles_csv(
 
 def fill_db(
         conn: Redis, clothing_collection: list[dict]
-):
+) -> None:
     vector_field_name = "weather_vector"
     clothing_field_name = "clothing_articles"
 
-    schema = [
-        VectorField(
-            vector_field_name,
-            "FLAT",
-            {"TYPE": "FLOAT32", "DIM": 300, "DISTANCE_METRIC": "COSINE"}
-        ),
-        TextField(clothing_field_name)
-    ]
-    conn.ft().create_index(schema)
+    pipeline = conn.pipeline(transaction=True)
 
     for item in tqdm(clothing_collection):
-        clothing = item['Clothing']['clothing_articles']
-        weather = item['Clothing']['weather']
+        weather_description = item['Clothing']['weather']
+        clothing_articles = item['Clothing']['clothing_articles']
 
-        weather_embedding = get_embedding(weather)
+        weather_embedding = get_embedding(weather_description)
 
-        if not isinstance(weather_embedding, np.ndarray) or weather_embedding.dtype != np.float32:
-            weather_embedding = np.array(weather_embedding, dtype=np.float32)
+        key = f"clothing:{weather_description.replace(' ', '_')}"
 
-        conn.hset(clothing, mapping={
-            vector_field_name: weather_embedding.tobytes(),
-            clothing_field_name: clothing
-        })
+        init_object = {
+            clothing_field_name: clothing_articles,
+            vector_field_name: weather_embedding.tolist()
+        }
+
+        pipeline.json().set(key, '$', init_object)
+
+    pipeline.execute()
+    print("Data has been saved to Redis!")
+
+
+def create_search_index(
+        conn: Redis
+) -> None:
+    IDX_NAME = 'clothing_idx'
+    schema = (
+        VectorField('$.weather_vector', 'FLAT', {
+            'TYPE': 'FLOAT32',
+            'DIM': 300,
+            'DISTANCE_METRIC': 'COSINE',
+        }, as_name='vector')
+    )
+    definition = IndexDefinition(prefix=['clothing:'], index_type=IndexType.JSON)
+    conn.ft(IDX_NAME).create_index(fields=schema, definition=definition)
+    print('Index created successfully!')
 
 
 if __name__ == "__main__":
     redis_conn = Redis(host="localhost", port=6379)
+    redis_conn.flushall()
     collection = parse_clothing_articles_csv()
     fill_db(redis_conn, collection)
+    create_search_index(redis_conn)
